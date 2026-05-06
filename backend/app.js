@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: "blender-threejs-mongo-me94.vercel.app"
+  origin: "*"
 }));
 app.use(express.json());
 

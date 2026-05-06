@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001/api/auth"; // Ajusta según tu backend
+const API_URL = "https://blender-threejs-mongo.onrender.com/api/auth";
 
 const GameAuthManager = {
   // Registro de usuario
@@ -25,17 +25,14 @@ const GameAuthManager = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.msg || "Error en el login");
 
-    // Guardar token en localStorage para usarlo en el juego
     localStorage.setItem("gameToken", data.token);
     return data;
   },
 
-  // Obtener token
   getToken() {
     return localStorage.getItem("gameToken");
   },
 
-  // Obtener el usuario autenticado
   async getCurrentUser() {
     const token = this.getToken();
     if (!token) return null;
@@ -47,6 +44,7 @@ const GameAuthManager = {
           "Content-Type": "application/json",
         },
       });
+
       const data = await res.json();
       if (!res.ok) return null;
       return data.user || data;
@@ -55,14 +53,15 @@ const GameAuthManager = {
     }
   },
 
-  // ========== SCORE MANAGEMENT ==========
+  // SCORE SYSTEM
 
-  // Guardar un nuevo puntaje
   async saveScore(score, level = 1, timeCompleted = 0, playerName = null) {
     const token = this.getToken();
+
     const headers = {
       "Content-Type": "application/json",
     };
+
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
@@ -72,51 +71,44 @@ const GameAuthManager = {
       level,
       timeCompleted,
     };
+
     if (playerName) {
       body.playerName = playerName;
     }
 
-    try {
-      // Usar endpoint de puntaje final
-      const res = await fetch(`${API_URL.replace("/auth", "")}/scores/final`, {
+    const res = await fetch(
+      "https://blender-threejs-mongo.onrender.com/api/scores/final",
+      {
         method: "POST",
         headers,
         body: JSON.stringify(body),
-      });
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.msg || data.message || "Error al guardar puntaje");
-      return data.data || data;
-    } catch (err) {
-      console.error("Error en saveScore:", err);
-      throw err;
-    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.msg || "Error al guardar puntaje");
+    return data.data || data;
   },
 
-  // Obtener los puntajes del usuario autenticado
   async getUserScores() {
     const token = this.getToken();
     if (!token) return [];
 
-    try {
-      const res = await fetch(`${API_URL.replace("/auth", "")}/scores/user`, {
+    const res = await fetch(
+      "https://blender-threejs-mongo.onrender.com/api/scores/user",
+      {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      });
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) return [];
-      return data.data || [];
-    } catch (err) {
-      console.error("Error en getUserScores:", err);
-      return [];
-    }
+    const data = await res.json();
+    if (!res.ok) return [];
+    return data.data || [];
   },
 
-  // Obtener el mejor puntaje del usuario
   async getUserHighScore() {
     try {
       const scores = await this.getUserScores();
@@ -127,72 +119,54 @@ const GameAuthManager = {
     }
   },
 
-  // Obtener el leaderboard global
   async getLeaderboard(limit = 10) {
-    try {
-      const res = await fetch(
-        `${API_URL.replace("/auth", "")}/scores/leaderboard?limit=${limit}`
-      );
-      const data = await res.json();
-      if (!res.ok) return [];
-      return data.data || [];
-    } catch (err) {
-      console.error("Error en getLeaderboard:", err);
-      return [];
-    }
+    const res = await fetch(
+      `https://blender-threejs-mongo.onrender.com/api/scores/leaderboard?limit=${limit}`
+    );
+
+    const data = await res.json();
+    if (!res.ok) return [];
+    return data.data || [];
   },
 
-  // Obtener posición del usuario en el leaderboard
   async getUserLeaderboardPosition() {
     const token = this.getToken();
     if (!token) return null;
 
-    try {
-      const res = await fetch(
-        `${API_URL.replace("/auth", "")}/scores/user/position`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const res = await fetch(
+      "https://blender-threejs-mongo.onrender.com/api/scores/user/position",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) return null;
-      return data.data || null;
-    } catch (err) {
-      console.error("Error en getUserLeaderboardPosition:", err);
-      return null;
-    }
+    const data = await res.json();
+    if (!res.ok) return null;
+    return data.data || null;
   },
 
-  // Obtener estadísticas del usuario
   async getUserStats() {
     const token = this.getToken();
     if (!token) return null;
 
-    try {
-      const res = await fetch(
-        `${API_URL.replace("/auth", "")}/scores/user/stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const res = await fetch(
+      "https://blender-threejs-mongo.onrender.com/api/scores/user/stats",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) return null;
-      return data.data || null;
-    } catch (err) {
-      console.error("Error en getUserStats:", err);
-      return null;
-    }
+    const data = await res.json();
+    if (!res.ok) return null;
+    return data.data || null;
   },
 
-  // Logout
   logout() {
     localStorage.removeItem("gameToken");
   },

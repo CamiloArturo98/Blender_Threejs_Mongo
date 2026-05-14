@@ -1,32 +1,91 @@
-## Proyecto Final UCC – Backend + Game (React + Three.js)
+# Gorilla Scape
 
-Monorepo con dos aplicaciones principales:
+Gorilla Scape is a multiplayer 3D game platform built with React, Three.js, Node.js, Express, MongoDB, and Socket.io.
 
-- `backend`: API REST y servidor WebSocket (Socket.io) con Node.js, Express y MongoDB.
-- `game-project`: Frontend 3D con React, Vite y Three.js.
+The project is structured as a monorepo containing:
 
----
-
-### Requisitos
-
-- Node.js 18+ y npm
-- MongoDB (local o Atlas)
+- `backend` → REST API and multiplayer WebSocket server
+- `game-project` → 3D frontend experience powered by React and Three.js
 
 ---
 
-### Estructura
+# Features
 
+## Backend
+
+- RESTful API architecture
+- Real-time multiplayer synchronization with Socket.io
+- MongoDB integration
+- Batch block generation system
+- Health monitoring endpoints
+- CORS support for frontend communication
+- Data synchronization scripts
+
+## Frontend
+
+- Real-time multiplayer gameplay
+- 3D rendering with Three.js
+- Physics integration using cannon-es
+- Audio system with Howler
+- Animations with GSAP
+- Mobile and keyboard controls
+- Modular game engine structure
+
+---
+
+# Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| React 19 | Frontend UI |
+| Vite | Frontend build tool |
+| Three.js | 3D rendering |
+| cannon-es | Physics engine |
+| GSAP | Animations |
+| Howler | Audio engine |
+| Node.js | Backend runtime |
+| Express.js | REST API |
+| MongoDB | Database |
+| Socket.io | Multiplayer networking |
+
+---
+
+# Project Structure
+
+```text
+Gorilla_Scape/
+├── backend/
+│   ├── data/
+│   ├── scripts/
+│   ├── routes/
+│   ├── models/
+│   ├── controllers/
+│   └── app.js
+│
+└── game-project/
+    ├── public/
+    └── src/
+        ├── Experience/
+        ├── loaders/
+        ├── network/
+        └── controls/
 ```
-Projecto_final_v1/
-├─ backend/            # API REST + Socket.io + scripts y datos
-└─ game-project/       # Frontend 3D (React + Vite + Three.js)
-```
 
 ---
 
-### Variables de entorno
+# Requirements
 
-Crear `backend/.env` con:
+- Node.js 18+
+- npm
+- MongoDB (Local or MongoDB Atlas)
+
+---
+
+# Environment Variables
+
+## Backend
+
+Create a `.env` file inside `backend/`.
 
 ```env
 MONGO_URI=mongodb://127.0.0.1:27017/threejs_blocks
@@ -34,7 +93,9 @@ PORT=3001
 API_URL=http://localhost:3001/api/blocks/batch
 ```
 
-Opcionalmente, en `game-project/.env` (o `.env.local`) para apuntar al backend:
+## Frontend
+
+Create `.env` or `.env.local` inside `game-project/`.
 
 ```env
 VITE_API_URL=http://localhost:3001
@@ -43,108 +104,246 @@ VITE_ENEMIES_COUNT=1
 
 ---
 
-### Instalación
+# Installation
 
-Ejecutar en cada proyecto:
+## Backend Setup
 
 ```bash
-# Backend
 cd backend
 npm install
+```
 
-# Frontend
+## Frontend Setup
+
+```bash
 cd ../game-project
 npm install
 ```
 
 ---
 
-### Ejecución en desarrollo
+# Running the Project
 
-Usa dos terminales:
+Use two separate terminals.
+
+## Start Backend
 
 ```bash
-# Terminal 1: Backend
 cd backend
 node app.js
-# Servirá en http://localhost:3001
-
-# Terminal 2: Frontend
-cd game-project
-npm run dev
-# Vite en http://localhost:5173 (con --host accesible en LAN)
 ```
 
-Si definiste `VITE_API_URL`, el frontend consumirá la API del backend en ese origen.
+Backend server:
+
+```text
+http://localhost:3001
+```
 
 ---
 
-### API REST (backend)
+## Start Frontend
 
-Base URL: `http://localhost:3001/api/blocks`
+```bash
+cd game-project
+npm run dev
+```
 
-- `GET /api/blocks?level=1` → Lista bloques por nivel (campos: `name, x, y, z, level`).
-- `POST /api/blocks` → Crea un bloque. Body JSON: `{ name, x, y, z, level }`.
-- `POST /api/blocks/batch` → Inserta múltiples bloques. Body: `[{ name, x, y, z, level }, ...]`.
-- `GET /api/blocks/ping` → Healthcheck (`{ message: "pong" }`).
+Frontend server:
 
-Autenticación: no requerida en desarrollo. CORS habilitado para orígenes del frontend.
+```text
+http://localhost:5173
+```
 
 ---
 
-### WebSocket (multijugador)
+# API Documentation
 
-Servidor Socket.io en el mismo puerto del backend (`http://localhost:3001`). Eventos principales:
+Base URL:
 
-- `new-player` → Registra e informa a otros jugadores.
-- `update-position` → Broadcast de posición/rotación.
-- `remove-player` → Notifica desconexiones.
-- `players-update` y `existing-players` → Sincronización de estado.
+```text
+http://localhost:3001/api/blocks
+```
 
-Cliente de ejemplo:
+## Endpoints
+
+### Get Blocks by Level
+
+```http
+GET /api/blocks?level=1
+```
+
+Response fields:
+
+```json
+{
+  "name": "Block A",
+  "x": 0,
+  "y": 1,
+  "z": 2,
+  "level": 1
+}
+```
+
+---
+
+### Create Block
+
+```http
+POST /api/blocks
+```
+
+Request body:
+
+```json
+{
+  "name": "Block A",
+  "x": 0,
+  "y": 1,
+  "z": 2,
+  "level": 1
+}
+```
+
+---
+
+### Insert Multiple Blocks
+
+```http
+POST /api/blocks/batch
+```
+
+Request body:
+
+```json
+[
+  {
+    "name": "Block A",
+    "x": 0,
+    "y": 1,
+    "z": 2,
+    "level": 1
+  }
+]
+```
+
+---
+
+### Health Check
+
+```http
+GET /api/blocks/ping
+```
+
+Response:
+
+```json
+{
+  "message": "pong"
+}
+```
+
+---
+
+# Multiplayer System
+
+Socket.io runs on the same backend server.
+
+Server URL:
+
+```text
+http://localhost:3001
+```
+
+## Main Events
+
+| Event | Description |
+|---|---|
+| `new-player` | Registers new players |
+| `update-position` | Synchronizes movement and rotation |
+| `remove-player` | Handles disconnections |
+| `players-update` | Updates multiplayer state |
+| `existing-players` | Sends connected players list |
+
+## Example Client Connection
 
 ```js
 import { io } from 'socket.io-client'
+
 const socket = io('http://localhost:3001')
 ```
 
 ---
 
-### Datos y scripts útiles (backend)
+# Backend Utilities
 
-- `backend/scripts/` → utilidades para generar/ sincronizar datos (`sync_blocks.js`, `generate_sources.js`, etc.).
-- `backend/data/` → JSON de modelos y posiciones.
-- `node seed.js` → carga de datos iniciales (opcional).
+## Scripts
 
-Consulta `backend/README.md` para detalles avanzados (niveles, exportación desde Blender, etc.).
+Location:
+
+```text
+backend/scripts/
+```
+
+Utility scripts include:
+
+- Block synchronization
+- Data generation
+- Source processing
+
+## Data
+
+Location:
+
+```text
+backend/data/
+```
+
+Contains:
+
+- Models
+- Position data
+- Game world resources
+
+Optional seed command:
+
+```bash
+node seed.js
+```
 
 ---
 
-### Frontend (game-project)
+# Frontend Architecture
 
-- Arranque: `npm run dev` (Vite). Ajusta `VITE_API_URL` si el backend corre en otra máquina/puerto.
-- Tecnologías: React 19, Three.js, cannon-es, GSAP, Howler, Socket.io Client.
+Main frontend modules:
 
-Estructura relevante:
-
-```
-game-project/
-├─ public/            # assets (modelos, texturas, sonidos)
-└─ src/
-   ├─ Experience/     # Núcleo 3D (cámaras, mundo, física, recursos)
-   ├─ loaders/        # Cargadores (p.ej., ToyCarLoader)
-   ├─ network/        # SocketManager (cliente)
-   └─ controls/       # Controles (móvil/teclado)
+```text
+game-project/src/
+├── Experience/     # Core 3D engine
+├── loaders/        # Asset loaders
+├── network/        # Multiplayer communication
+└── controls/       # Input systems
 ```
 
 ---
 
-### Desarrollo simultáneo y puertos
+# Development Ports
 
-- Backend: `3001`
-- Frontend (Vite): `5173`
+| Service | Port |
+|---|---|
+| Backend | 3001 |
+| Frontend | 5173 |
 
-Si pruebas en red local, levanta Vite con `npm run dev -- --host` y usa `VITE_API_URL` apuntando a la IP LAN del backend, por ejemplo:
+---
+
+# LAN Multiplayer Testing
+
+Run Vite with host enabled:
+
+```bash
+npm run dev -- --host
+```
+
+Example frontend environment configuration:
 
 ```env
 VITE_API_URL=http://192.168.1.100:3001
@@ -152,17 +351,60 @@ VITE_API_URL=http://192.168.1.100:3001
 
 ---
 
-### Solución de problemas
+# Troubleshooting
 
-- Asegura que MongoDB esté corriendo y `MONGO_URI` sea accesible.
-- Si el frontend no carga datos, verifica `VITE_API_URL` y la consola del navegador.
-- CORS: el backend permite `origin: '*'` vía Socket.io y `cors()` en Express para desarrollo.
+## MongoDB Connection Issues
+
+Ensure MongoDB is running and the `MONGO_URI` is correct.
+
+## Frontend Cannot Reach Backend
+
+Verify:
+
+- `VITE_API_URL`
+- Backend server status
+- Browser console errors
+
+## CORS Issues
+
+CORS is enabled in development using:
+
+- Express `cors()`
+- Socket.io `origin: '*'`
 
 ---
 
-### Licencia y autoría
+# Deployment Ready
 
-- Autor: Gustavo Willyn Sánchez Rodríguez — `guswillsan@gmail.com`
-- Licencia: ISC (verifica archivos de licencia si aplica).
+The architecture supports:
 
+- Local development
+- LAN multiplayer environments
+- Cloud deployment
+- Containerized infrastructure
 
+---
+
+# Future Improvements
+
+Potential future enhancements:
+
+- Authentication system
+- Matchmaking
+- Dedicated game servers
+- Player persistence
+- Advanced physics interactions
+- Voice chat integration
+- Leaderboards and rankings
+
+---
+
+# License
+
+ISC License.
+
+---
+
+# Author
+
+Developed by Camilo.
